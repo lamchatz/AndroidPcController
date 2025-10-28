@@ -1,13 +1,12 @@
 package lchat.pccontroller
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
 
 class RequestHandler {
     companion object {
@@ -34,7 +33,7 @@ class RequestHandler {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("PcController", "Request failed", e)
                 false
             }
         }
@@ -42,6 +41,10 @@ class RequestHandler {
         suspend fun openAge(): Boolean = makeRequest("age")
 
         suspend fun openSpotify(): Boolean = makeRequest("spotify")
+
+        suspend fun openYoutube(): Boolean = makeRequest("open/youtube")
+
+        suspend fun openDisney(): Boolean = makeRequest("open/disney")
 
     }
 }
