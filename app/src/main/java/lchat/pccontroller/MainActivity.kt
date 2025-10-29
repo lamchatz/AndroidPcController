@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,23 +48,31 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MyApp() {
         MaterialTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
+            // Define your gradient
+            val gradient = Brush.linearGradient(
+                colors = listOf(
+                    Color(color = 0xFF211F2F),
+                    Color(0xFF918CA9)
+                ),
+                start = Offset(0f, 0f),
+                end = Offset(Float.POSITIVE_INFINITY, 0f) // left → right
+            )
+
+            // Apply it to the Box background
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(brush = gradient),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        SpotifyButton()
-                        AgeButton()
-                        YoutubeButton()
-                        DisneyButton()
-                    }
+                    SpotifyButton()
+                    AgeButton()
+                    YoutubeButton()
+                    DisneyButton()
                 }
             }
         }
