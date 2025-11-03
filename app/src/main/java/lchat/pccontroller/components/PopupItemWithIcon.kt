@@ -70,7 +70,7 @@ fun PopupItemWithIconPreview() {
             icon = painterResource(id = R.drawable.spotify), // make sure you have this logo in drawable
             onClick = {
                 // For preview, we don't actually launch Spotify, just return true
-                
+
             }
         )
     }

@@ -2,6 +2,7 @@ package lchat.pccontroller.components// Assuming your BaseButton and lchat.pccon
 // and R.drawable.youtube is available.
 
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -31,14 +32,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lchat.pccontroller.R
+import lchat.pccontroller.RequestHandler
 
 private const val ANIMATION_DURATION = 300
 
@@ -62,6 +66,8 @@ fun YoutubeButton() {
     var showDialog by remember { mutableStateOf(false) }
     var animateDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     val close = {
         animateDialog = false
         coroutineScope.launch {
@@ -80,7 +86,6 @@ fun YoutubeButton() {
         }
     )
 
-
     if (showDialog) {
         LaunchedEffect(Unit) {
             animateDialog = true
@@ -92,6 +97,12 @@ fun YoutubeButton() {
                 close()
             },
             onHomeClicked = {
+                RequestHandler.executeRequest(
+                    context = context,
+                    scope = coroutineScope,
+                    request = { RequestHandler.openYoutube() },
+                    successMessage = "Opening Youtube!"
+                )
                 close()
             },
             onSearchClicked = {
@@ -108,6 +119,7 @@ fun YoutubeOptionsDialog(
     onHomeClicked: () -> Unit,
     onSearchClicked: () -> Unit
 ) {
+
     Dialog(onDismissRequest = onDismiss) {
         AnimatedVisibility(
             visible = visible,

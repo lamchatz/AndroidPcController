@@ -1,7 +1,11 @@
 package lchat.pccontroller
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -46,5 +50,22 @@ class RequestHandler {
 
         suspend fun openDisney(): Boolean = makeRequest("open/disney")
 
+        fun executeRequest(
+            context: Context,
+            scope: CoroutineScope,
+            request: suspend () -> Boolean,
+            successMessage: String? = null,
+            errorMessage: String = "Something went wrong"
+        ) {
+            scope.launch {
+                val result = runCatching { request() }.getOrElse { false }
+                if (successMessage != null) {
+                    withContext(Dispatchers.Main) {
+                        val message = if (result) successMessage else errorMessage
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 }

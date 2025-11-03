@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import lchat.pccontroller.RequestHandler
 
 
 @Composable
@@ -45,13 +46,12 @@ fun BaseButton(
 
     Button(
         onClick = {
-            scope.launch {
-                val success = onClick(context)
-                if (msg != null) {
-                    val toastText = if (success) msg else "Something went wrong"
-                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
-                }
-            }
+            RequestHandler.executeRequest(
+                context = context,
+                scope = scope,
+                request = { onClick(context) },
+                successMessage = msg
+            )
         },
         shape = shape,
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),
