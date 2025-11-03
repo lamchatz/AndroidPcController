@@ -37,22 +37,3 @@ fun SpotifyButton() {
         }
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun SpotifyButtonPreview() {
-    // Optional: wrap in your theme if needed
-    MaterialTheme {
-        BaseButton(
-            text = "Spotify",
-            msg = "Opening Spotify!",
-            containerColor = Color(0xFF1DB954),
-            shape = RoundedCornerShape(16.dp),
-            icon = painterResource(id = R.drawable.spotify), // make sure you have this logo in drawable
-            onClick = {
-                // For preview, we don't actually launch Spotify, just return true
-                true
-            }
-        )
-    }
-}

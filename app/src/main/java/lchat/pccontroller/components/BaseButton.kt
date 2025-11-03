@@ -22,16 +22,16 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun BaseButton(
     text: String,
-    msg: String,
+    msg: String? = null,
     containerColor: Color,
     textColor: Color = Color.White,
     icon: Painter? = null,
@@ -47,8 +47,10 @@ fun BaseButton(
         onClick = {
             scope.launch {
                 val success = onClick(context)
-                val toastText = if (success) msg else "Something went wrong"
-                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
+                if (msg != null) {
+                    val toastText = if (success) msg else "Something went wrong"
+                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
+                }
             }
         },
         shape = shape,
@@ -68,18 +70,17 @@ fun BaseButton(
                     contentDescription = "$text logo",
                     tint = Color.Unspecified,
                     modifier = Modifier
-                        .size(72.dp)        // bigger icon
-                        .padding(end = 16.dp) // more spacing
+                        .size(72.dp)
+                        .padding(end = 16.dp)
                 )
             }
             Text(
                 text = text,
                 color = textColor,
-                fontSize = 20.sp,       // slightly bigger text
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
         }
     }
-
-
 }
+
