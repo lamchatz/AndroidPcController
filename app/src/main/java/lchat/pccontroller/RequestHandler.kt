@@ -47,8 +47,12 @@ class RequestHandler {
         suspend fun openSpotify(): Boolean = makeRequest("spotify")
 
         suspend fun openYoutube(): Boolean = makeRequest("open/youtube")
+        suspend fun openYoutubeVideo(videoId: String): Boolean =
+            makeRequest("open/youtube?videoId=$videoId")
 
         suspend fun openDisney(): Boolean = makeRequest("open/disney")
+
+
 
         fun executeRequest(
             context: Context,
