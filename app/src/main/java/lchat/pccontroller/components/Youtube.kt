@@ -5,11 +5,6 @@ import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,18 +58,6 @@ import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
 import lchat.pccontroller.yt.YouTubeViewModel
 
-private const val ANIMATION_DURATION = 300
-
-
-val DialogEnterAnimation =
-    scaleIn(initialScale = 0.8f, animationSpec = tween(ANIMATION_DURATION + 200)) + fadeIn(
-        animationSpec = tween(ANIMATION_DURATION + 200)
-    )
-
-
-val DialogExitAnimation = scaleOut(animationSpec = tween(ANIMATION_DURATION)) + fadeOut(
-    animationSpec = tween(ANIMATION_DURATION)
-)
 
 @Composable
 fun YoutubeButton(navController: NavController) {
@@ -86,7 +69,7 @@ fun YoutubeButton(navController: NavController) {
     val close = {
         animateDialog = false
         coroutineScope.launch {
-            delay(ANIMATION_DURATION.toLong())
+            delay(POPUP_ANIMATION_DURATION.toLong())
             showDialog = false
         }
     }
