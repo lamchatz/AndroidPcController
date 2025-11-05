@@ -96,6 +96,8 @@ class RequestHandler {
 
         suspend fun decrease(): Boolean = makeRequest("sound/decrease")
 
+        suspend fun setVolume(arg: Float): Boolean = makeRequest("sound/set?arg=$arg")
+
         suspend fun turnMonitorOff(): Boolean = makeRequest("turnMonitorOff")
 
         suspend fun paste(text: String): Boolean = makeRequest("paste/$text")
@@ -111,11 +113,14 @@ class RequestHandler {
         ) {
             scope.launch {
                 val result = runCatching { request() }.getOrElse { false }
-                if (successMessage != null) {
-                    withContext(Dispatchers.Main) {
-                        val message = if (result) successMessage else errorMessage
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }
+                val message = if (result) {
+                    successMessage ?: ""
+                } else {
+                    errorMessage
+                }
+
+                if (message.isNotEmpty()) {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
