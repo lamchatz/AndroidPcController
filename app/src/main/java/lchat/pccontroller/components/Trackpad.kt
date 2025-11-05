@@ -1,14 +1,19 @@
 package lchat.pccontroller.components
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.navigation.NavController
+import lchat.pccontroller.MouseWebSocketClient
 import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -19,6 +24,26 @@ enum class MouseActionType {
     SCROLL,
     RIGHT_CLICK
 }
+
+@Composable
+fun TrackpadScreen(navController: NavController) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.DarkGray)
+    ) {
+        Trackpad { event ->
+            MouseWebSocketClient.sendAction(event)
+        }
+
+        // Back button support
+        BackHandler {
+            navController.popBackStack()
+        }
+    }
+}
+
 
 @Composable
 fun Trackpad(onEvent: (JSONObject) -> Unit) {

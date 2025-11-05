@@ -62,4 +62,5 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0")
 }
