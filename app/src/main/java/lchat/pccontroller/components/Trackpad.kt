@@ -47,11 +47,12 @@ import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-enum class MouseActionType {
+enum class ActionType {
     CLICK,
     MOVE,
     SCROLL,
-    TYPE
+    TYPE,
+    BACKSPACE
 }
 
 @Composable
@@ -66,6 +67,7 @@ fun TrackpadScreen() {
 
     var showTextField by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
+    var previousText by remember { mutableStateOf("") }
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -113,7 +115,33 @@ fun TrackpadScreen() {
             ) {
                 TextField(
                     value = text,
-                    onValueChange = { text = it },
+                    onValueChange = { newText ->
+                        // Determine what changed
+                        val diff = newText.length - previousText.length
+
+                        if (diff > 0) {
+                            // New characters typed
+                            val typedChar = newText.substring(previousText.length)
+                            typedChar.forEach { c ->
+                                val json = JSONObject().apply {
+                                    put("action", ActionType.TYPE)
+                                    put("text", c.toString())
+                                }
+                                MouseWebSocketClient.sendAction(json)
+                            }
+                        } else if (diff < 0) {
+                            // Characters deleted — send backspace
+                            repeat(-diff) {
+                                val json = JSONObject().apply {
+                                    put("action", ActionType.BACKSPACE)
+                                }
+                                MouseWebSocketClient.sendAction(json)
+                            }
+                        }
+
+                        previousText = newText
+                        text = newText
+                    },
                     placeholder = { Text("Type here") },
                     singleLine = true,
                     modifier = Modifier
@@ -125,16 +153,10 @@ fun TrackpadScreen() {
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            if (text.isNotBlank()) {
-                                val json = JSONObject().apply {
-                                    put("action", MouseActionType.TYPE)
-                                    put("text", text)
-                                }
-                                MouseWebSocketClient.sendAction(json)
-                            }
                             showTextField = false
                             focusManager.clearFocus()
                             text = ""
+                            previousText = ""
                         }
                     )
                 )
@@ -172,7 +194,7 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                             if (delta != Offset.Zero) {
                                 // Single-finger drag → mouse move
                                 val json = JSONObject().apply {
-                                    put("action", MouseActionType.MOVE)
+                                    put("action", ActionType.MOVE)
                                     put("dx", delta.x.roundToInt())
                                     put("dy", delta.y.roundToInt())
                                 }
@@ -185,7 +207,7 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                                 if (!dragOccurred) {
                                     // Single tap → left click
                                     val json =
-                                        JSONObject().apply { put("action", MouseActionType.CLICK) }
+                                        JSONObject().apply { put("action", ActionType.CLICK) }
                                     onEvent(json)
                                 }
                                 break
@@ -204,7 +226,7 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                             if (verticalMove && (abs(dy0) > 0.5f || abs(dy1) > 0.5f)) {
                                 val amount = -((dy0 + dy1) / 2).roundToInt()
                                 val json = JSONObject().apply {
-                                    put("action", MouseActionType.SCROLL)
+                                    put("action", ActionType.SCROLL)
                                     put("amount", amount)
                                 }
                                 onEvent(json)
