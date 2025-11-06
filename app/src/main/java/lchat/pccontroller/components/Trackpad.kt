@@ -1,19 +1,47 @@
 package lchat.pccontroller.components
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import lchat.pccontroller.MouseWebSocketClient
+import lchat.pccontroller.R
 import lchat.pccontroller.components.utils.MenuGradient
 import org.json.JSONObject
 import kotlin.math.abs
@@ -23,12 +51,26 @@ enum class MouseActionType {
     CLICK,
     MOVE,
     SCROLL,
-    RIGHT_CLICK
+    TYPE
 }
 
 @Composable
-fun TrackpadScreen(navController: NavController) {
+@Preview
+fun prevTracpadScreen() {
+    TrackpadScreen()
+}
+
+@Composable
+fun TrackpadScreen() {
     println("opening trackpad")
+
+    var showTextField by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("") }
+
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -37,9 +79,78 @@ fun TrackpadScreen(navController: NavController) {
         Trackpad { event ->
             MouseWebSocketClient.sendAction(event)
         }
+
+        // Floating button with icon
+        SmallFloatingActionButton(
+            onClick = { showTextField = true },
+            modifier = Modifier
+                .size(80.dp)
+                .align(Alignment.BottomEnd)
+                .offset(
+                    x = (-8
+                            ).dp, y = (-64).dp
+                ) // move a bit higher
+                .padding(16.dp),
+            shape = CircleShape,
+            containerColor = Color(0xFF6FD573),
+            contentColor = Color.DarkGray,
+            elevation = FloatingActionButtonDefaults.elevation(4.dp)
+        ) {
+            Icon(painterResource(id = R.drawable.space), contentDescription = "Text Input")
+        }
+
+        if (showTextField) {
+            // Overlay TextField
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x88000000)) // semi-transparent overlay
+                    .clickable {
+                        showTextField = false
+                        focusManager.clearFocus()
+                    }, // dismiss on outside tap
+                contentAlignment = Alignment.Center
+            ) {
+                TextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    placeholder = { Text("Type here") },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .focusRequester(focusRequester),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (text.isNotBlank()) {
+                                val json = JSONObject().apply {
+                                    put("action", MouseActionType.TYPE)
+                                    put("text", text)
+                                }
+                                MouseWebSocketClient.sendAction(json)
+                            }
+                            showTextField = false
+                            focusManager.clearFocus()
+                            text = ""
+                        }
+                    )
+                )
+
+                // Auto-focus and open keyboard when TextField appears
+                LaunchedEffect(showTextField) {
+                    if (showTextField) {
+                        delay(100) // small delay to ensure layout
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
+                    }
+                }
+            }
+        }
     }
 }
-
 
 @Composable
 fun Trackpad(onEvent: (JSONObject) -> Unit) {
@@ -99,25 +210,12 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                                 onEvent(json)
                                 event.changes.forEach { it.consume() }
                             }
-
-                            // Two-finger tap → right click
-
-                            if (changes.all { it.changedToUp() }) {
-                                val moved = changes.any { it.positionChange() != Offset.Zero }
-                                if (!moved) {
-                                    val json = JSONObject().apply {
-                                        put(
-                                            "action",
-                                            MouseActionType.RIGHT_CLICK
-                                        )
-                                    }
-                                    onEvent(json)
-                                }
-                                break
-                            }
                         }
                     }
                 }
             }
     )
 }
+
+// Replace this with your actual brush
+

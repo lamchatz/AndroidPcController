@@ -33,7 +33,7 @@ fun AppNavHost() {
             enterTransition = trackpadEnterTransition,
             exitTransition = trackpadExitTransition
         ) {
-            TrackpadScreen(navController)
+            TrackpadScreen()
         }
     }
 }
