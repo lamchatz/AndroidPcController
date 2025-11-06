@@ -1,6 +1,5 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.components.buttons
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +35,10 @@ import kotlinx.coroutines.launch
 import lchat.pccontroller.ClipboardUtils
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
+import lchat.pccontroller.components.utils.CopyMenu
+import lchat.pccontroller.components.utils.DialogEnterAnimation
+import lchat.pccontroller.components.utils.DialogExitAnimation
+import lchat.pccontroller.components.utils.POPUP_ANIMATION_DURATION
 
 @Composable
 fun CopyButton() {

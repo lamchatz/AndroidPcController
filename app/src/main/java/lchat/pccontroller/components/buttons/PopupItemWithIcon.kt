@@ -1,4 +1,4 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.components.buttons
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

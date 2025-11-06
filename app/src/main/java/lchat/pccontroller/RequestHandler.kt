@@ -103,6 +103,7 @@ class RequestHandler {
         suspend fun paste(text: String): Boolean = makeRequest("paste/$text")
 
         suspend fun copy(): String = makeReadRequest("copy")
+        suspend fun close(): Boolean = makeRequest("close")
 
         fun executeRequest(
             context: Context,

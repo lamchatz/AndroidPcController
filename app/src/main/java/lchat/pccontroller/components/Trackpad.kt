@@ -14,6 +14,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.navigation.NavController
 import lchat.pccontroller.MouseWebSocketClient
+import lchat.pccontroller.components.utils.MenuGradient
 import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -27,19 +28,14 @@ enum class MouseActionType {
 
 @Composable
 fun TrackpadScreen(navController: NavController) {
-
+    println("opening trackpad")
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.DarkGray)
+            .background(brush = MenuGradient)
     ) {
         Trackpad { event ->
             MouseWebSocketClient.sendAction(event)
-        }
-
-        // Back button support
-        BackHandler {
-            navController.popBackStack()
         }
     }
 }

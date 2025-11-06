@@ -35,7 +35,6 @@ object MouseWebSocketClient {
     }
 
     fun sendAction(json: JSONObject) {
-        println(json)
         ws?.send(json.toString())
     }
 

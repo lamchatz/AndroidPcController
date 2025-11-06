@@ -13,7 +13,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Connect to your PC WebSocket server
-        MouseWebSocketClient.connect("")
 
         setContent {
             MaterialTheme {
@@ -22,10 +21,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        MouseWebSocketClient.close()
     }
 }

@@ -1,15 +1,11 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.components.buttons
 
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 

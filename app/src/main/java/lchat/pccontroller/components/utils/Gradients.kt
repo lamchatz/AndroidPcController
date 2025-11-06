@@ -1,4 +1,4 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.components.utils
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush

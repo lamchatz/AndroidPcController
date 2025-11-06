@@ -1,4 +1,4 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.components.buttons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color

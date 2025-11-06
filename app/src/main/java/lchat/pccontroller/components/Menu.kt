@@ -26,6 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
+import lchat.pccontroller.components.buttons.AgeButton
+import lchat.pccontroller.components.buttons.BaseButton
+import lchat.pccontroller.components.buttons.CopyButton
+import lchat.pccontroller.components.buttons.DisneyButton
+import lchat.pccontroller.components.buttons.SpotifyButton
+import lchat.pccontroller.components.utils.MenuGradient
 
 
 @Composable
@@ -39,9 +45,13 @@ fun MenuScreen(navController: NavController) {
             .fillMaxSize()
             .background(brush = MenuGradient)
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount ->
-                    if (dragAmount > 20) { // Swipe right threshold
-                        navController.navigate("trackpad")
+                detectHorizontalDragGestures { _, dragAmount ->
+                    if (dragAmount > 20) {
+                        if (navController.currentDestination?.route != "trackpad") {
+                            navController.navigate("trackpad") {
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 }
             },
@@ -57,6 +67,14 @@ fun MenuScreen(navController: NavController) {
             YoutubeButton(navController)
             DisneyButton()
             CopyButton()
+            BaseButton(
+                text = "Close",
+
+                containerColor = Color.Red,
+                onClick = {
+                    RequestHandler.close()
+                }
+            )
         }
 
         // Bottom volume slider
