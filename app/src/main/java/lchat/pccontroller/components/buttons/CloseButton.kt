@@ -7,13 +7,13 @@ import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 
 @Composable
-fun DisneyButton() {
+fun CloseButton() {
     BaseIconButton(
-        icon = painterResource(id = R.drawable.disney),
-        containerColor = Color(0xFF113CCF),
+        icon = painterResource(id = R.drawable.close),
+        containerColor = Color(0xFFF44336),
+        scale = 1f,
         onClick = {
-            RequestHandler.openDisney()
-        },
-        successMessage = "Opening Disney+"
+            RequestHandler.close()
+        }
     )
 }

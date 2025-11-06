@@ -8,6 +8,7 @@ import lchat.pccontroller.components.utils.trackpadEnterTransition
 import lchat.pccontroller.components.utils.trackpadExitTransition
 import lchat.pccontroller.components.utils.youtubeEnterTransition
 import lchat.pccontroller.components.utils.youtubeExitTransition
+import lchat.pccontroller.yt.YoutubeSearchScreen
 
 @Composable
 fun AppNavHost() {

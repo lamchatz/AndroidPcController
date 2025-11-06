@@ -1,4 +1,4 @@
-package lchat.pccontroller.components
+package lchat.pccontroller.yt
 
 import android.app.Activity
 import android.content.Context
@@ -56,14 +56,13 @@ import kotlinx.coroutines.launch
 import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
-import lchat.pccontroller.components.buttons.BaseButton
 import lchat.pccontroller.components.buttons.PopupItemWithIcon
+import lchat.pccontroller.components.buttons.BaseIconButton
 import lchat.pccontroller.components.utils.DialogEnterAnimation
 import lchat.pccontroller.components.utils.DialogExitAnimation
 import lchat.pccontroller.components.utils.POPUP_ANIMATION_DURATION
 import lchat.pccontroller.components.utils.YoutubeMenu
 import lchat.pccontroller.components.utils.YoutubeSearch
-import lchat.pccontroller.yt.YouTubeViewModel
 
 
 @Composable
@@ -81,10 +80,9 @@ fun YoutubeButton(navController: NavController) {
         }
     }
 
-    BaseButton(
-        text = "Youtube",
+    BaseIconButton(
         icon = painterResource(id = R.drawable.youtube),
-        containerColor = Color(0xFFFF0000),
+        containerColor = Color.White,
         onClick = {
             showDialog = true
             true

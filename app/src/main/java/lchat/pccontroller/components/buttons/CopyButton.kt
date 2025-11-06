@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lchat.pccontroller.ClipboardUtils
+import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
 import lchat.pccontroller.components.utils.CopyMenu
@@ -55,11 +57,10 @@ fun CopyButton() {
         }
     }
 
-    BaseButton(
-        text = "Copy",
-        msg = "Copied to PC!",
-        longPressMsg = "Copied from PC!",
-        containerColor = Color(0xFF6343A2),
+    BaseIconButton(
+        icon = painterResource(id = R.drawable.copy),
+        containerColor = Color(0xFFA88FC5),
+        scale = 0.7f,
         onClick = {
             RequestHandler.paste(ClipboardUtils.getText(context))
         },
@@ -76,7 +77,9 @@ fun CopyButton() {
             } else {
                 false
             }
-        }
+        },
+        successMessage = "Copied to PC!",
+        longPressMessage = "Copied from PC!"
     )
 
     if (showDialog) {

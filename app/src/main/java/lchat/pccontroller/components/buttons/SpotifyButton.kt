@@ -11,11 +11,10 @@ import lchat.pccontroller.RequestHandler
 
 @Composable
 fun SpotifyButton() {
-    BaseButton(
-        text = "Spotify",
-        msg = "Opening Spotify",
-        containerColor = Color(0xFF1DB954),
+    BaseIconButton(
         icon = painterResource(id = R.drawable.spotify),
+        containerColor = Color(0xFF1DB954),
+        scale = 1f,
         onClick = { context ->
             val success = RequestHandler.openSpotify()
             if (success) {
@@ -30,6 +29,7 @@ fun SpotifyButton() {
                 }
             }
             success
-        }
+        },
+        successMessage = "Opening Spotify"
     )
 }

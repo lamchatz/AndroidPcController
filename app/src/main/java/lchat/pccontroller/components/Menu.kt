@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
@@ -27,18 +29,28 @@ import androidx.navigation.NavController
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
 import lchat.pccontroller.components.buttons.AgeButton
-import lchat.pccontroller.components.buttons.BaseButton
+import lchat.pccontroller.components.buttons.CloseButton
 import lchat.pccontroller.components.buttons.CopyButton
 import lchat.pccontroller.components.buttons.DisneyButton
 import lchat.pccontroller.components.buttons.SpotifyButton
 import lchat.pccontroller.components.utils.MenuGradient
-
+import lchat.pccontroller.yt.YoutubeButton
 
 @Composable
 fun MenuScreen(navController: NavController) {
     var sliderValue by remember { mutableStateOf(50f) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val buttons: List<@Composable () -> Unit> = listOf(
+        { SpotifyButton() },
+        { AgeButton() },
+        { YoutubeButton(navController) },
+        { DisneyButton() },
+        { CopyButton() },
+        { CloseButton() }
+    )
+
 
     Box(
         modifier = Modifier
@@ -58,23 +70,18 @@ fun MenuScreen(navController: NavController) {
         contentAlignment = Alignment.Center
     ) {
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth()
+                .align(Alignment.Center)
         ) {
-            SpotifyButton()
-            AgeButton()
-            YoutubeButton(navController)
-            DisneyButton()
-            CopyButton()
-            BaseButton(
-                text = "Close",
-
-                containerColor = Color.Red,
-                onClick = {
-                    RequestHandler.close()
-                }
-            )
+            items(buttons.size) { index ->
+                buttons[index]()
+            }
         }
 
         // Bottom volume slider
