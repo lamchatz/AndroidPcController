@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 
@@ -14,7 +15,6 @@ fun SpotifyButton() {
     BaseIconButton(
         icon = painterResource(id = R.drawable.spotify),
         containerColor = Color(0xFF1DB954),
-        scale = 1f,
         onClick = { context ->
             val success = RequestHandler.openSpotify()
             if (success) {
@@ -32,4 +32,10 @@ fun SpotifyButton() {
         },
         successMessage = "Opening Spotify"
     )
+}
+
+@Composable
+@Preview
+fun PreviewSpotifyButton() {
+    SpotifyButton()
 }
