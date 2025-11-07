@@ -76,7 +76,6 @@ fun VolumeRow(
         horizontalArrangement = Arrangement.spacedBy(24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Optional: quick preset
         VolumeIcon(
             iconRes = R.drawable.half_volume,
             description = "Half volume",

@@ -58,7 +58,6 @@ class RequestHandler {
 
                         val body = response.body?.string()?.trim() ?: return@use "empty"
 
-                        // Parse the JSON map and extract the output
                         val json = JSONObject(body)
                         if (json.optBoolean("success", false)) {
                             json.optString("output", "empty")

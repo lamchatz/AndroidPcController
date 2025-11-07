@@ -82,13 +82,11 @@ fun BaseIconButton(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Make the icon scale uniformly and fit inside the circle
         Icon(
             painter = icon,
             contentDescription = "Button icon",
             tint = iconTint,
             modifier = Modifier
-                //.size(size * scale)
                 .clip(CircleShape)
                 .fillMaxWidth(scale)
                 .fillMaxHeight(scale)

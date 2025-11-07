@@ -21,9 +21,9 @@ val YoutubeSearch = Brush.linearGradient(
 
 val CopyMenu = Brush.radialGradient(
     colors = listOf(
-        Color(0xFFA88FC5), // hsla(261, 35%, 66%, 1)
-        Color(0xFF9990B3), // hsla(260, 24%, 60%, 1)
-        Color(0xFF58517A)  // hsla(260, 41%, 45%, 1)
+        Color(0xFFA88FC5),
+        Color(0xFF9990B3),
+        Color(0xFF58517A)
     ),
     center = Offset.Unspecified,
     radius = Float.POSITIVE_INFINITY

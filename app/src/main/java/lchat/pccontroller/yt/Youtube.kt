@@ -183,7 +183,6 @@ fun YoutubeSearchScreen(viewModel: YouTubeViewModel = viewModel()) {
     var query by remember { mutableStateOf("") }
     var hasSearched by remember { mutableStateOf(false) }
 
-    // Animate top padding for search field
     val topPadding by animateDpAsState(targetValue = if (hasSearched) 32.dp else 400.dp)
 
     Column(
@@ -194,7 +193,6 @@ fun YoutubeSearchScreen(viewModel: YouTubeViewModel = viewModel()) {
     ) {
         Spacer(modifier = Modifier.height(topPadding))
 
-        // Search field
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
@@ -226,7 +224,6 @@ fun YoutubeSearchScreen(viewModel: YouTubeViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Videos list
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

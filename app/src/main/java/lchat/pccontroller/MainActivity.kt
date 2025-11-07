@@ -13,8 +13,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Connect to your PC WebSocket server
-
         setContent {
             MaterialTheme {
                 Surface {

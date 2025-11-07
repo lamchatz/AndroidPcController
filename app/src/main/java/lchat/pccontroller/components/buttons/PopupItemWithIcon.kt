@@ -62,14 +62,11 @@ fun PopupItemWithIcon(
 @Preview(showBackground = true)
 @Composable
 fun PopupItemWithIconPreview() {
-    // Optional: wrap in your theme if needed
     MaterialTheme {
         PopupItemWithIcon(
             text = "Spotify",
-            icon = painterResource(id = R.drawable.spotify), // make sure you have this logo in drawable
+            icon = painterResource(id = R.drawable.spotify),
             onClick = {
-                // For preview, we don't actually launch Spotify, just return true
-
             }
         )
     }

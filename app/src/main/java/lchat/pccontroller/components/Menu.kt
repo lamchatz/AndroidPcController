@@ -82,7 +82,6 @@ fun MenuScreen(navController: NavController) {
             }
         }
 
-        // Bottom volume slider
         Column(
             modifier = Modifier
                 .fillMaxWidth()

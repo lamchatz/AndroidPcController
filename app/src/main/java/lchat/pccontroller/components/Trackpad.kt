@@ -28,8 +28,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -82,7 +90,6 @@ fun TrackpadScreen() {
             MouseWebSocketClient.sendAction(event)
         }
 
-        // Floating button with icon
         SmallFloatingActionButton(
             onClick = { showTextField = true },
             modifier = Modifier
@@ -91,7 +98,7 @@ fun TrackpadScreen() {
                 .offset(
                     x = (-8
                             ).dp, y = (-64).dp
-                ) // move a bit higher
+                )
                 .padding(16.dp),
             shape = CircleShape,
             containerColor = Color(0xFF6FD573),
@@ -102,25 +109,24 @@ fun TrackpadScreen() {
         }
 
         if (showTextField) {
-            // Overlay TextField
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0x88000000)) // semi-transparent overlay
+                    .background(Color(0x88000000))
                     .clickable {
                         showTextField = false
                         focusManager.clearFocus()
-                    }, // dismiss on outside tap
+                        text = ""
+                        previousText = ""
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 TextField(
                     value = text,
                     onValueChange = { newText ->
-                        // Determine what changed
                         val diff = newText.length - previousText.length
 
                         if (diff > 0) {
-                            // New characters typed
                             val typedChar = newText.substring(previousText.length)
                             typedChar.forEach { c ->
                                 val json = JSONObject().apply {
@@ -130,7 +136,6 @@ fun TrackpadScreen() {
                                 MouseWebSocketClient.sendAction(json)
                             }
                         } else if (diff < 0) {
-                            // Characters deleted — send backspace
                             repeat(-diff) {
                                 val json = JSONObject().apply {
                                     put("action", ActionType.BACKSPACE)
@@ -143,28 +148,16 @@ fun TrackpadScreen() {
                         text = newText
                     },
                     placeholder = { Text("Type here") },
-                    singleLine = true,
+                    singleLine = false,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .focusRequester(focusRequester),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            showTextField = false
-                            focusManager.clearFocus()
-                            text = ""
-                            previousText = ""
-                        }
-                    )
+                        .focusRequester(focusRequester)
                 )
 
-                // Auto-focus and open keyboard when TextField appears
                 LaunchedEffect(showTextField) {
                     if (showTextField) {
-                        delay(100) // small delay to ensure layout
+                        delay(100)
                         focusRequester.requestFocus()
                         keyboardController?.show()
                     }
@@ -221,7 +214,6 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                             val dx0 = changes[0].positionChange().x
                             val dx1 = changes[1].positionChange().x
 
-                            // Only consider vertical movement if vertical is greater than horizontal
                             val verticalMove = (abs(dy0) > abs(dx0) || abs(dy1) > abs(dx1))
                             if (verticalMove && (abs(dy0) > 0.5f || abs(dy1) > 0.5f)) {
                                 val amount = -((dy0 + dy1) / 2).roundToInt()
@@ -238,6 +230,3 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
             }
     )
 }
-
-// Replace this with your actual brush
-

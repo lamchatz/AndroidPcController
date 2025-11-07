@@ -143,7 +143,7 @@ fun CopyPopup(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            onSendClick(inputText) // trigger Send on Enter/Done
+                            onSendClick(inputText)
                         }
                     )
                 )
@@ -201,7 +201,7 @@ fun CopyPopup2(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            onSendClick(inputText) // trigger Send on Enter/Done
+                            onSendClick(inputText)
                         }
                     )
                 )
