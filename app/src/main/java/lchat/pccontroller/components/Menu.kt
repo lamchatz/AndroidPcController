@@ -31,9 +31,11 @@ import androidx.navigation.compose.rememberNavController
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
 import lchat.pccontroller.components.buttons.AgeButton
+import lchat.pccontroller.components.buttons.AndroidStudioButton
 import lchat.pccontroller.components.buttons.CloseButton
 import lchat.pccontroller.components.buttons.CopyButton
 import lchat.pccontroller.components.buttons.DisneyButton
+import lchat.pccontroller.components.buttons.IntellijButton
 import lchat.pccontroller.components.buttons.SpotifyButton
 import lchat.pccontroller.components.utils.MenuGradient
 import lchat.pccontroller.yt.YoutubeButton
@@ -48,7 +50,9 @@ fun MenuScreen(navController: NavController) {
         { YoutubeButton(navController) },
         { DisneyButton() },
         { CopyButton() },
-        { CloseButton() }
+        { CloseButton() },
+        { IntellijButton() },
+        { AndroidStudioButton() }
     )
 
     Box(

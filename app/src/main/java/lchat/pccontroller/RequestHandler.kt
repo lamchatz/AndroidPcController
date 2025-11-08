@@ -85,6 +85,9 @@ class RequestHandler {
 
         suspend fun openDisney(): Boolean = makeRequest("open/disney")
 
+        suspend fun openIntellij(): Boolean = makeRequest("open/intellij")
+        suspend fun openAndroidStudio(): Boolean = makeRequest("open/android")
+
         suspend fun toggleMute(): Boolean = makeRequest("sound/toggle")
 
         suspend fun maxSound(): Boolean = makeRequest("sound/max")
@@ -100,8 +103,8 @@ class RequestHandler {
         suspend fun turnMonitorOff(): Boolean = makeRequest("turnMonitorOff")
 
         suspend fun paste(text: String): Boolean = makeRequest("paste/$text")
-
         suspend fun copy(): String = makeReadRequest("copy")
+
         suspend fun close(): Boolean = makeRequest("close")
 
         fun executeRequest(
