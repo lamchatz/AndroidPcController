@@ -104,13 +104,11 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                if (RequestHandler.halfSound()) {
+                val success = RequestHandler.halfSound()
+                if (success) {
                     onSliderValueChange(50f)
-                    true
-                } else {
-                    false
                 }
-
+                success
             },
 
             errorMessage = "Failed to set half volume"
@@ -123,12 +121,11 @@ fun VolumeRow(
             scope = scope,
             errorMessage = "Failed to decrease sound",
             request = {
-                if (RequestHandler.decrease()) {
+                val success = RequestHandler.decrease()  // make the network request first
+                if (success) {
                     onSliderValueChange((sliderValue - volumeChangeValue).coerceAtMost(100f))
-                    true
-                } else {
-                    false
                 }
+                success
             }
         )
 
@@ -147,12 +144,11 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                if (RequestHandler.increase()) {
+                val success = RequestHandler.increase()
+                if (success) {
                     onSliderValueChange((sliderValue + volumeChangeValue).coerceAtMost(100f))
-                    true
-                } else {
-                    false
                 }
+                success
             },
             errorMessage = "Failed to increase sound"
         )
@@ -163,12 +159,11 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                if (RequestHandler.maxSound()) {
+                val success = RequestHandler.maxSound()
+                if (success) {
                     onSliderValueChange(100f)
-                    true
-                } else {
-                    false
                 }
+                success
             },
             errorMessage = "Failed to set max volume"
         )
