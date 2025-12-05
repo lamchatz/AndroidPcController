@@ -11,8 +11,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -22,17 +23,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import lchat.pccontroller.R
 import lchat.pccontroller.RequestHandler
 import lchat.pccontroller.RequestHandler.Companion.executeRequest
+import lchat.pccontroller.VolumeKey
+import lchat.pccontroller.VolumeViewModel
 
 
 @Composable
-fun VolumeUtils() {
-    var sliderValue by remember { mutableStateOf(50f) }
+fun VolumeUtils(volumeViewModel: VolumeViewModel = viewModel()) {
+    var sliderValue by remember { mutableFloatStateOf(50f) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        volumeViewModel.volumeEvent.collect { event ->
+            when (event) {
+                VolumeKey.Up -> {
+                    if (RequestHandler.increase()) {
+                        sliderValue = (sliderValue + volumeChangeValue).coerceAtMost(100f)
+                    }
+                }
+
+                VolumeKey.Down -> {
+                    if (RequestHandler.decrease()) {
+                        sliderValue = (sliderValue - volumeChangeValue).coerceAtLeast(0f)
+                    }
+                }
+            }
+        }
+    }
 
     Slider(
         value = sliderValue,
@@ -82,8 +104,14 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                onSliderValueChange(50f)
-                RequestHandler.halfSound() },
+                if (RequestHandler.halfSound()) {
+                    onSliderValueChange(50f)
+                    true
+                } else {
+                    false
+                }
+
+            },
 
             errorMessage = "Failed to set half volume"
         )
@@ -95,8 +123,12 @@ fun VolumeRow(
             scope = scope,
             errorMessage = "Failed to decrease sound",
             request = {
-                onSliderValueChange((sliderValue - volumeChangeValue).coerceAtMost(100f))
-                RequestHandler.decrease()
+                if (RequestHandler.decrease()) {
+                    onSliderValueChange((sliderValue - volumeChangeValue).coerceAtMost(100f))
+                    true
+                } else {
+                    false
+                }
             }
         )
 
@@ -115,8 +147,12 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                onSliderValueChange((sliderValue + volumeChangeValue).coerceAtMost(100f))
-                RequestHandler.increase()
+                if (RequestHandler.increase()) {
+                    onSliderValueChange((sliderValue + volumeChangeValue).coerceAtMost(100f))
+                    true
+                } else {
+                    false
+                }
             },
             errorMessage = "Failed to increase sound"
         )
@@ -127,9 +163,13 @@ fun VolumeRow(
             context = context,
             scope = scope,
             request = {
-                onSliderValueChange(100f)
-                RequestHandler.maxSound() },
-
+                if (RequestHandler.maxSound()) {
+                    onSliderValueChange(100f)
+                    true
+                } else {
+                    false
+                }
+            },
             errorMessage = "Failed to set max volume"
         )
     }

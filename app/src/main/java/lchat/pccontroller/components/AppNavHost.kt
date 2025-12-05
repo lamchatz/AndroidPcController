@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import lchat.pccontroller.VolumeViewModel
 import lchat.pccontroller.components.utils.trackpadEnterTransition
 import lchat.pccontroller.components.utils.trackpadExitTransition
 import lchat.pccontroller.components.utils.youtubeEnterTransition
@@ -11,13 +12,13 @@ import lchat.pccontroller.components.utils.youtubeExitTransition
 import lchat.pccontroller.yt.YoutubeSearchScreen
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(volumeViewModel: VolumeViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "menu") {
 
         composable("menu") {
-            MenuScreen(navController)
+            MenuScreen(navController, volumeViewModel)
         }
 
         composable(
