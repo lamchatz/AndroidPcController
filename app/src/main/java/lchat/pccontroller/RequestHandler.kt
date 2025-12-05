@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,7 +16,7 @@ import org.json.JSONObject
 
 class RequestHandler {
     companion object {
-        private const val BASE_URL = "http://192.168.2.7:9091/"
+        private const val BASE_URL = "http://192.168.1.11:9091/"
         private val client = OkHttpClient()
 
         private fun buildPostRequest(endpoint: String): Request {
@@ -102,7 +103,7 @@ class RequestHandler {
 
         suspend fun turnMonitorOff(): Boolean = makeRequest("turnMonitorOff")
 
-        suspend fun paste(text: String): Boolean = makeRequest("paste/$text")
+        suspend fun paste(text: String): Boolean = makeRequestWithBody("paste", text)
         suspend fun copy(): String = makeReadRequest("copy")
 
         suspend fun close(): Boolean = makeRequest("close")
@@ -127,5 +128,24 @@ class RequestHandler {
                 }
             }
         }
+
+        private suspend fun makeRequestWithBody(endpoint: String, body: String): Boolean =
+            withContext(Dispatchers.IO) {
+                try {
+                    val requestBody = body.toRequestBody("text/plain".toMediaType())
+                    val request = Request.Builder()
+                        .url(BASE_URL + endpoint)
+                        .post(requestBody)
+                        .build()
+
+                    client.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) return@use false
+                        response.body?.string()?.trim()?.lowercase() == "true"
+                    }
+                } catch (e: Exception) {
+                    Log.e("PcController", "Request failed", e)
+                    false
+                }
+            }
     }
 }
