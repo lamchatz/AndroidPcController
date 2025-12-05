@@ -88,6 +88,7 @@ class RequestHandler {
 
         suspend fun openIntellij(): Boolean = makeRequest("open/intellij")
         suspend fun openAndroidStudio(): Boolean = makeRequest("open/android")
+        suspend fun openOpera(): Boolean = makeRequest("open/opera")
 
         suspend fun toggleMute(): Boolean = makeRequest("sound/toggle")
 

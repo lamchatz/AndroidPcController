@@ -23,6 +23,7 @@ import lchat.pccontroller.components.buttons.CloseButton
 import lchat.pccontroller.components.buttons.CopyButton
 import lchat.pccontroller.components.buttons.DisneyButton
 import lchat.pccontroller.components.buttons.IntellijButton
+import lchat.pccontroller.components.buttons.OperaButton
 import lchat.pccontroller.components.buttons.SpotifyButton
 import lchat.pccontroller.components.utils.MenuGradient
 import lchat.pccontroller.yt.YoutubeButton
@@ -39,7 +40,8 @@ fun MenuScreen(navController: NavController, volumeViewModel: VolumeViewModel) {
         { CopyButton() },
         { CloseButton() },
         { IntellijButton() },
-        { AndroidStudioButton() }
+        { AndroidStudioButton() },
+        { OperaButton() }
     )
 
     Box(
