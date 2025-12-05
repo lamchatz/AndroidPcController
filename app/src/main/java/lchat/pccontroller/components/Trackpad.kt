@@ -3,16 +3,15 @@ package lchat.pccontroller.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
@@ -28,24 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import lchat.pccontroller.MouseWebSocketClient
@@ -60,14 +49,12 @@ enum class ActionType {
     MOVE,
     SCROLL,
     TYPE,
-    BACKSPACE
+    BACKSPACE,
+    ENTER,
+    ESC
 }
 
-@Composable
-@Preview
-fun prevTracpadScreen() {
-    TrackpadScreen()
-}
+private val SIZE = 64.dp
 
 @Composable
 fun TrackpadScreen() {
@@ -90,22 +77,66 @@ fun TrackpadScreen() {
             MouseWebSocketClient.sendAction(event)
         }
 
-        SmallFloatingActionButton(
-            onClick = { showTextField = true },
-            modifier = Modifier
-                .size(80.dp)
-                .align(Alignment.BottomEnd)
-                .offset(
-                    x = (-8
-                            ).dp, y = (-64).dp
-                )
-                .padding(16.dp),
-            shape = CircleShape,
-            containerColor = Color(0xFF6FD573),
-            contentColor = Color.DarkGray,
-            elevation = FloatingActionButtonDefaults.elevation(4.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Icon(painterResource(id = R.drawable.space), contentDescription = "Text Input")
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 56.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                SmallFloatingActionButton(
+                    onClick = {
+                        val json =
+                            JSONObject().apply { put("action", ActionType.ESC) }
+                        MouseWebSocketClient.sendAction(json)
+                    },
+                    modifier = Modifier.size(SIZE),
+                    shape = CircleShape,
+                    containerColor = Color(0xFF6FD573),
+                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.esc),
+                        contentDescription = "Escape"
+                    )
+                }
+
+                SmallFloatingActionButton(
+                    onClick = {
+                        val json =
+                            JSONObject().apply { put("action", ActionType.ENTER) }
+                        MouseWebSocketClient.sendAction(json)
+                    },
+                    modifier = Modifier.size(SIZE),
+                    shape = CircleShape,
+                    containerColor = Color(0xFF6FD573),
+                    contentColor = Color.DarkGray,
+                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.enter),
+                        contentDescription = "Enter"
+                    )
+                }
+
+                // Bottom button (your original one)
+                SmallFloatingActionButton(
+                    onClick = { showTextField = true },
+                    modifier = Modifier.size(SIZE),
+                    shape = CircleShape,
+                    containerColor = Color(0xFF6FD573),
+                    contentColor = Color.DarkGray,
+                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.space),
+                        contentDescription = "Text Input"
+                    )
+                }
+            }
         }
 
         if (showTextField) {
