@@ -21,8 +21,8 @@ import lchat.pccontroller.components.buttons.AgeButton
 import lchat.pccontroller.components.buttons.AndroidStudioButton
 import lchat.pccontroller.components.buttons.CloseButton
 import lchat.pccontroller.components.buttons.CopyButton
-import lchat.pccontroller.components.buttons.DisneyButton
 import lchat.pccontroller.components.buttons.IntellijButton
+import lchat.pccontroller.components.buttons.NetflixButton
 import lchat.pccontroller.components.buttons.OperaButton
 import lchat.pccontroller.components.buttons.SpotifyButton
 import lchat.pccontroller.components.buttons.TODOButton
@@ -37,7 +37,8 @@ fun MenuScreen(navController: NavController, volumeViewModel: VolumeViewModel) {
         { SpotifyButton() },
         { AgeButton() },
         { YoutubeButton(navController) },
-        { DisneyButton() },
+       //{ DisneyButton() },
+        { NetflixButton() },
         { CopyButton() },
         { CloseButton() },
         { IntellijButton() },

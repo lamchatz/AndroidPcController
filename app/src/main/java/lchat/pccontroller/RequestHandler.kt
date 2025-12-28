@@ -85,6 +85,7 @@ class RequestHandler {
             makeRequest("open/youtube?videoId=$videoId")
 
         suspend fun openDisney(): Boolean = makeRequest("open/disney")
+        suspend fun openNetflix(): Boolean = makeRequest("open/netflix")
 
         suspend fun openIntellij(): Boolean = makeRequest("open/intellij")
         suspend fun openAndroidStudio(): Boolean = makeRequest("open/android")
