@@ -160,7 +160,7 @@ fun EditConnectionDialog(
                         onClick = {
                             onSave(ip, port, nickname)
                         },
-                        enabled = ip.isNotBlank() && port.isNotBlank() && nickname.isNotBlank()
+                        enabled = ip.isNotBlank() && port.isNotBlank() && nickname.isNotBlank() && connectionTestResult is ConnectionTestResult.Success
                     ) {
                         Text("Save & Select", maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }

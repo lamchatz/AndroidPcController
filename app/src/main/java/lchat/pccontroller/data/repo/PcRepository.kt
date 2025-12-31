@@ -14,7 +14,7 @@ class PcRepository private constructor(
     val DEFAULT_BASE_URL = "-1.-1.-1.-1"
 
     private val repoScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _selectedPc = MutableStateFlow<PC?>(PC(-1,"1", "1", "1", false))
+    private val _selectedPc = MutableStateFlow<PC?>(PC(-1,"-1.-1.-1.-1", "-1", "invalid", false))
     val selectedPc: StateFlow<PC?> = _selectedPc
 
     private val _baseUrl = MutableStateFlow(DEFAULT_BASE_URL)
@@ -25,8 +25,12 @@ class PcRepository private constructor(
         // Collect Room Flow and update StateFlow
         repoScope.launch {
             dao.observeSelectedPC().collect { pc ->
-                _selectedPc.value = pc
-                _baseUrl.value = pc?.let { "http://${it.ip}:${it.port}/" } ?: DEFAULT_BASE_URL
+                if (pc != null && pc.id >= 0) {
+                    _selectedPc.value = pc
+                    _baseUrl.value = pc.let { "http://${it.ip}:${it.port}/" }
+                } else {
+                    _baseUrl.value = DEFAULT_BASE_URL
+                }
             }
         }
     }
