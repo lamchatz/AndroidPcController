@@ -58,8 +58,6 @@ private val SIZE = 64.dp
 
 @Composable
 fun TrackpadScreen() {
-    println("opening trackpad")
-
     var showTextField by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     var previousText by remember { mutableStateOf("") }

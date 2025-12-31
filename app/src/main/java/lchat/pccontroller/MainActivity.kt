@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
         val db = AppDatabase.getDatabase(this)
         val repository = PcRepository.getInstance(db.pcRepo())
+        RequestHandler.init(repository)
 
         lifecycleScope.launch {
             val allPcs = repository.getAll()
@@ -55,28 +56,30 @@ class MainActivity : ComponentActivity() {
                     .show()
             } else {
                 repository.selectedPc.collect { pc ->
-                    if (pc == null) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "No Connection selected",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        when (RequestHandler.testConnection(pc.ip, pc.port)) {
-                            is ConnectionTestResult.Error -> Toast.makeText(
+                    if (pc != null) {
+                        if (pc.id == -1) {
+                            Toast.makeText(
                                 this@MainActivity,
-                                "Selected Connection has Errors",
+                                "No Connection selected",
                                 Toast.LENGTH_SHORT
                             ).show()
+                        } else {
+                            when (RequestHandler.testConnection(pc.ip, pc.port)) {
+                                is ConnectionTestResult.Error -> Toast.makeText(
+                                    this@MainActivity,
+                                    "Selected Connection has Errors",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-                            ConnectionTestResult.Timeout -> Toast.makeText(
-                                this@MainActivity,
-                                "Selected Connection Timed out",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                ConnectionTestResult.Timeout -> Toast.makeText(
+                                    this@MainActivity,
+                                    "Selected Connection Timed out",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-                            ConnectionTestResult.Success -> {
-                                //do Nothing
+                                ConnectionTestResult.Success -> {
+                                    //do Nothing
+                                }
                             }
                         }
                     }

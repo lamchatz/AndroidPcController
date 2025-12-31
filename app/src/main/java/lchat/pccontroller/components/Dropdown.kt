@@ -1,5 +1,6 @@
 package lchat.pccontroller.components
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +37,8 @@ fun LongBasicDropdownMenu(pcViewModel: PCViewModel = viewModel()) {
     val options by pcViewModel.pcs.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var connectionToEdit by remember { mutableStateOf<PC?>(null) }
+    val context = LocalContext.current
+
 
     Box(
         modifier = Modifier
@@ -91,7 +95,6 @@ fun LongBasicDropdownMenu(pcViewModel: PCViewModel = viewModel()) {
             connectionToEdit = connectionToEdit,
             onSave = { ip, port, nickname ->
                 showDialog = false
-                println("IP: $ip, Nickname: $nickname")
                 if (connectionToEdit == null) {
                     pcViewModel.addPc(PC(0, ip, port, nickname, true))
                 } else {
@@ -104,6 +107,12 @@ fun LongBasicDropdownMenu(pcViewModel: PCViewModel = viewModel()) {
                         )
                     )
                 }
+
+                Toast.makeText(
+                    context,
+                    "Connecting to $nickname",
+                    Toast.LENGTH_SHORT
+                ).show()
             },
             onCancel = {
                 showDialog = false

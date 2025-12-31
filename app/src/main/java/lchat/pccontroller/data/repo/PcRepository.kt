@@ -14,7 +14,7 @@ class PcRepository private constructor(
     val DEFAULT_BASE_URL = "-1.-1.-1.-1"
 
     private val repoScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _selectedPc = MutableStateFlow<PC?>(null)
+    private val _selectedPc = MutableStateFlow<PC?>(PC(-1,"1", "1", "1", false))
     val selectedPc: StateFlow<PC?> = _selectedPc
 
     private val _baseUrl = MutableStateFlow(DEFAULT_BASE_URL)

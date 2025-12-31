@@ -5,10 +5,12 @@ import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import lchat.pccontroller.data.ConnectionTestResult
+import lchat.pccontroller.data.repo.PcRepository
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -16,13 +18,29 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
-class RequestHandler {
-    companion object {
-        var port = 9091
-        var host = "192.168.1.11:$port"
+class RequestHandler private constructor() {
 
-        private var BASE_URL = "http://$host/"
+    companion object {
+        private var BASE_URL = "http://-1.-1.-1.-1/"
         private val client = OkHttpClient()
+
+        // Keep a reference to the job so we can cancel if needed
+        private var repoJob: Job? = null
+
+        /**
+         * Initialize the RequestHandler with a PCRepository.
+         * This starts observing the baseUrl automatically.
+         */
+        fun init(pcRepository: PcRepository) {
+            // Cancel any previous subscription
+            repoJob?.cancel()
+
+            repoJob = CoroutineScope(Dispatchers.IO).launch {
+                pcRepository.baseUrl.collect { url ->
+                    BASE_URL = url
+                }
+            }
+        }
 
         private fun buildPostRequest(endpoint: String): Request {
             val body = "".toRequestBody("text/plain".toMediaTypeOrNull())
