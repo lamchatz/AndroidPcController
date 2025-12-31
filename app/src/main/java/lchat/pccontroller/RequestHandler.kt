@@ -7,6 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import lchat.pccontroller.data.ConnectionTestResult
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -16,7 +18,10 @@ import org.json.JSONObject
 
 class RequestHandler {
     companion object {
-        private const val BASE_URL = "http://192.168.1.11:9091/"
+        var port = 9091
+        var host = "192.168.1.11:$port"
+
+        private var BASE_URL = "http://$host/"
         private val client = OkHttpClient()
 
         private fun buildPostRequest(endpoint: String): Request {
@@ -150,5 +155,40 @@ class RequestHandler {
                     false
                 }
             }
+
+        suspend fun testConnection(ip: String, port: String): ConnectionTestResult =
+            withContext(Dispatchers.IO) {
+                try {
+                    withTimeout(3000L) {
+                        val url = "http://$ip:$port/test"
+                        val request = Request.Builder().url(url).get().build()
+
+                        client.newCall(request).execute().use { response ->
+                            if (!response.isSuccessful) {
+                                Log.e("PcController", "Connection test failed: ${response.body}")
+
+                                return@use ConnectionTestResult.Error("HTTP ${response.code}")
+                            }
+
+                            val body = response.body?.string()?.trim()
+                                ?: return@use ConnectionTestResult.Error("Empty response")
+
+                            if (body.lowercase() == "true") {
+                                ConnectionTestResult.Success
+                            } else {
+                                Log.e("PcController", "Connection test failed: ${response.body}")
+                                ConnectionTestResult.Error("Server returned false")
+                            }
+                        }
+                    }
+                } catch (_: java.util.concurrent.TimeoutException) {
+                    ConnectionTestResult.Timeout
+                } catch (e: Exception) {
+                    Log.e("PcController", "Connection test failed", e)
+                    ConnectionTestResult.Error(e.localizedMessage ?: "Unknown error")
+                }
+            }
+
     }
+
 }

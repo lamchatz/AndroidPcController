@@ -1,7 +1,6 @@
 package lchat.pccontroller.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -25,12 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import lchat.pccontroller.R
-import lchat.pccontroller.data.AppDatabase
 import lchat.pccontroller.data.PC
-import lchat.pccontroller.data.repo.PcRepository
 import lchat.pccontroller.data.viewmodel.PCViewModel
-
-
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -46,7 +41,10 @@ fun LongBasicDropdownMenu(pcViewModel: PCViewModel = viewModel()) {
             .padding(16.dp)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(painter = painterResource(R.drawable.setting), contentDescription = "Connect to ip")
+            Icon(
+                painter = painterResource(R.drawable.setting),
+                contentDescription = "Manage connections"
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -93,16 +91,26 @@ fun LongBasicDropdownMenu(pcViewModel: PCViewModel = viewModel()) {
             connectionToEdit = connectionToEdit,
             onSave = { ip, port, nickname ->
                 showDialog = false
-                // Handle saved values here
                 println("IP: $ip, Nickname: $nickname")
                 if (connectionToEdit == null) {
-                    pcViewModel.addPc(PC(0, ip, "9091", nickname, true))
+                    pcViewModel.addPc(PC(0, ip, port, nickname, true))
                 } else {
-                    pcViewModel.update(connectionToEdit!!.copy(ip = ip, port = port, nickName = nickname))
+                    pcViewModel.update(
+                        connectionToEdit!!.copy(
+                            ip = ip,
+                            port = port,
+                            nickName = nickname,
+                            selected = true
+                        )
+                    )
                 }
             },
             onCancel = {
                 showDialog = false
+            },
+            onDelete = {
+                showDialog = false
+                pcViewModel.delete(connectionToEdit!!)
             }
         )
     }
