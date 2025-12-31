@@ -29,7 +29,7 @@ import lchat.pccontroller.data.PC
 fun EditConnectionDialog(
     show: Boolean,
     connectionToEdit: PC?,
-    onSave: (ip: String, nickname: String) -> Unit,
+    onSave: (ip: String, port: String, nickname: String) -> Unit,
     onCancel: () -> Unit
 ) {
     if (!show) return
@@ -88,7 +88,7 @@ fun EditConnectionDialog(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = { onSave(ip, nickname) },
+                        onClick = { onSave(ip, port, nickname) },
                         enabled = ip.isNotBlank() && nickname.isNotBlank()
                     ) {
                         Text("Save")
