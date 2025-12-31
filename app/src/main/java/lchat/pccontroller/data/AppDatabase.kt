@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import lchat.pccontroller.data.repo.PCRepo
 
-@Database(entities = [PC::class], version = 1)
+@Database(entities = [PC::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun pcRepo(): PCRepo
 

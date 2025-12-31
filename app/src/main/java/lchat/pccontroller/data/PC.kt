@@ -5,7 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "PC")
 data class PC(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val ip: String,
-    val nickName: String
+    val port: String,
+    val nickName: String,
+    val selected: Boolean
 )
