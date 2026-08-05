@@ -70,8 +70,7 @@ enum class ActionType {
     BACKSPACE,
     ENTER,
     ESC,
-    DESKTOP,
-    ALT_TAB
+    DESKTOP
 }
 
 private val FAB_SIZE = 60.dp

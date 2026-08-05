@@ -34,10 +34,6 @@ import lchat.pccontroller.yt.YoutubeButton
 
 private const val PC_PREFERENCES_NAME = "pc_preferences"
 
-private val Context.dataStore by preferencesDataStore(
-    name = PC_PREFERENCES_NAME
-)
-
 @Composable
 fun MenuScreen(
     navController: NavController,
