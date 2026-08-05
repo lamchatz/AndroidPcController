@@ -1,20 +1,27 @@
 package lchat.pccontroller.components
-
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -22,9 +29,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -35,108 +47,186 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import lchat.pccontroller.MouseWebSocketClient
 import lchat.pccontroller.R
 import lchat.pccontroller.components.utils.MenuGradient
 import org.json.JSONObject
-import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 enum class ActionType {
     CLICK,
+    RIGHT_CLICK,
     MOVE,
     SCROLL,
     TYPE,
     BACKSPACE,
     ENTER,
-    ESC
+    ESC,
+    DESKTOP,
+    ALT_TAB
 }
 
-private val SIZE = 64.dp
+private val FAB_SIZE = 60.dp
+private val OPTION_SIZE = 48.dp
+private const val SCROLL_STEP = 8
+
+private val ControlGreen = Color(0xFF6FD573)
+private val DarkIconColor = Color(0xFF303030)
 
 @Composable
 fun TrackpadScreen() {
     var showTextField by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     var previousText by remember { mutableStateOf("") }
+    var isMenuExpanded by remember { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    val scrollButtonStyle = Modifier
+        .size(FAB_SIZE)
+        .shadow(4.dp, CircleShape)
+        .clip(CircleShape)
+        .background(ControlGreen)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = MenuGradient)
     ) {
+        // Trackpad area with Long-Press Right-Click support
         Trackpad { event ->
             MouseWebSocketClient.sendAction(event)
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize()
+        // --- SCROLL BUTTONS (Middle Right) ---
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 56.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ActionButton(
+                iconId = R.drawable.up,
+                contentDescription = "Scroll Up",
+                modifier = scrollButtonStyle.repeatingScroll(-SCROLL_STEP)
+            )
+
+            ActionButton(
+                iconId = R.drawable.down,
+                contentDescription = "Scroll Down",
+                modifier = scrollButtonStyle.repeatingScroll(SCROLL_STEP)
+            )
+        }
+
+        // --- EXPANDING RADIAL SPEED DIAL MENU (Bottom Right) ---
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 56.dp, end = 24.dp),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            // Arc Options Container
+            AnimatedVisibility(
+                visible = isMenuExpanded,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut()
             ) {
-
-                SmallFloatingActionButton(
-                    onClick = {
-                        val json =
-                            JSONObject().apply { put("action", ActionType.ESC) }
-                        MouseWebSocketClient.sendAction(json)
-                    },
-                    modifier = Modifier.size(SIZE),
-                    shape = CircleShape,
-                    containerColor = Color(0xFF6FD573),
-                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                Box(
+                    modifier = Modifier.size(200.dp),
+                    contentAlignment = Alignment.BottomEnd
                 ) {
-                    Icon(
-                        painterResource(id = R.drawable.esc),
-                        contentDescription = "Escape"
-                    )
-                }
+                    // 1. ESC Button
+                    MenuArcOption(
+                        angleDeg = 180f, // Leftmost
+                        onClick = {
+                            isMenuExpanded = false
+                            sendAction(ActionType.ESC)
+                        }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(DarkIconColor, RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("ESC", color = ControlGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
 
-                SmallFloatingActionButton(
-                    onClick = {
-                        val json =
-                            JSONObject().apply { put("action", ActionType.ENTER) }
-                        MouseWebSocketClient.sendAction(json)
-                    },
-                    modifier = Modifier.size(SIZE),
-                    shape = CircleShape,
-                    containerColor = Color(0xFF6FD573),
-                    contentColor = Color.DarkGray,
-                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.enter),
-                        contentDescription = "Enter"
-                    )
-                }
+                    // 2. Show Desktop Button (Win + D)
+                    MenuArcOption(
+                        angleDeg = 150f,
+                        onClick = {
+                            isMenuExpanded = false
+                            sendAction(ActionType.DESKTOP)
+                        }
+                    ) {
+                        CircleOptionIcon(iconId = R.drawable.desktop, contentDescription = "Desktop")
+                    }
 
-                // Bottom button (your original one)
-                SmallFloatingActionButton(
-                    onClick = { showTextField = true },
-                    modifier = Modifier.size(SIZE),
-                    shape = CircleShape,
-                    containerColor = Color(0xFF6FD573),
-                    contentColor = Color.DarkGray,
-                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.space),
-                        contentDescription = "Text Input"
-                    )
+                    // 3. ENTER Button
+                    MenuArcOption(
+                        angleDeg = 120f,
+                        onClick = {
+                            isMenuExpanded = false
+                            sendAction(ActionType.ENTER)
+                        }
+                    ) {
+                        CircleOptionIcon(iconId = R.drawable.enter, contentDescription = "Enter")
+                    }
+
+                    // 4. TYPE/Keyboard Button
+                    MenuArcOption(
+                        angleDeg = 90f, // Topmost
+                        onClick = {
+                            isMenuExpanded = false
+                            showTextField = true
+                        }
+                    ) {
+                        CircleOptionIcon(iconId = R.drawable.space, contentDescription = "Text Input")
+                    }
                 }
+            }
+
+            // Main Trigger FAB Toggle Button
+            val rotationAngle by animateFloatAsState(
+                targetValue = if (isMenuExpanded) 45f else 0f,
+                animationSpec = spring(stiffness = Spring.StiffnessLow),
+                label = "fabRotation"
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(FAB_SIZE)
+                    .shadow(6.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(ControlGreen)
+                    .clickable { isMenuExpanded = !isMenuExpanded },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.widget),
+                    contentDescription = "Toggle Actions Menu",
+                    tint = DarkIconColor,
+                    modifier = Modifier
+                        .size(26.dp)
+                        .rotate(rotationAngle)
+                )
             }
         }
 
+        // Fullscreen Text Field Overlay
         if (showTextField) {
             Box(
                 modifier = Modifier
@@ -196,6 +286,7 @@ fun TrackpadScreen() {
     }
 }
 
+// Trackpad with move, quick tap (left click), and long press (right click)
 @Composable
 fun Trackpad(onEvent: (JSONObject) -> Unit) {
     Box(
@@ -204,6 +295,13 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
             .pointerInput(Unit) {
                 awaitEachGesture {
                     var dragOccurred = false
+                    val longPressThreshold = 500L
+                    val moveTolerance = 10f
+                    var initialPosition = Offset.Zero
+
+                    val down = awaitPointerEvent().changes.firstOrNull() ?: return@awaitEachGesture
+                    initialPosition = down.position
+                    val downTime = System.currentTimeMillis()
 
                     while (true) {
                         val event = awaitPointerEvent()
@@ -213,8 +311,11 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                             val change = event.changes[0]
                             val delta = change.positionChange()
 
+                            if ((change.position - initialPosition).getDistance() > moveTolerance) {
+                                dragOccurred = true
+                            }
+
                             if (delta != Offset.Zero) {
-                                // Single-finger drag → mouse move
                                 val json = JSONObject().apply {
                                     put("action", ActionType.MOVE)
                                     put("dx", delta.x.roundToInt())
@@ -222,40 +323,128 @@ fun Trackpad(onEvent: (JSONObject) -> Unit) {
                                 }
                                 onEvent(json)
                                 change.consume()
-                                dragOccurred = true
                             }
 
                             if (change.changedToUp()) {
                                 if (!dragOccurred) {
-                                    // Single tap → left click
-                                    val json =
-                                        JSONObject().apply { put("action", ActionType.CLICK) }
+                                    val pressDuration = System.currentTimeMillis() - downTime
+                                    val action = if (pressDuration >= longPressThreshold) {
+                                        ActionType.RIGHT_CLICK
+                                    } else {
+                                        ActionType.CLICK
+                                    }
+                                    val json = JSONObject().apply { put("action", action) }
                                     onEvent(json)
                                 }
                                 break
                             }
-
-                        } else if (pointers == 2) {
-                            val changes = event.changes.toList()
-
-                            val dy0 = changes[0].positionChange().y
-                            val dy1 = changes[1].positionChange().y
-                            val dx0 = changes[0].positionChange().x
-                            val dx1 = changes[1].positionChange().x
-
-                            val verticalMove = (abs(dy0) > abs(dx0) || abs(dy1) > abs(dx1))
-                            if (verticalMove && (abs(dy0) > 0.5f || abs(dy1) > 0.5f)) {
-                                val amount = -((dy0 + dy1) / 2).roundToInt()
-                                val json = JSONObject().apply {
-                                    put("action", ActionType.SCROLL)
-                                    put("amount", amount)
-                                }
-                                onEvent(json)
-                                event.changes.forEach { it.consume() }
-                            }
+                        } else {
+                            break
                         }
                     }
                 }
             }
     )
+}
+
+@Composable
+private fun MenuArcOption(
+    radiusDp: Float = 130f,
+    angleDeg: Float,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val angleRad = Math.toRadians(angleDeg.toDouble())
+    val xOffset = (radiusDp * cos(angleRad)).dp
+    val yOffset = (-radiusDp * sin(angleRad)).dp
+
+    Box(
+        modifier = Modifier
+            .offset(x = xOffset, y = yOffset)
+            .size(OPTION_SIZE)
+            .shadow(4.dp, CircleShape)
+            .clip(CircleShape)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun CircleOptionIcon(iconId: Int, contentDescription: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ControlGreen),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = iconId),
+            contentDescription = contentDescription,
+            tint = DarkIconColor,
+            modifier = Modifier.size(22.dp)
+        )
+    }
+}
+
+@Composable
+private fun ActionButton(
+    iconId: Int,
+    contentDescription: String,
+    modifier: Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = iconId),
+            contentDescription = contentDescription,
+            tint = DarkIconColor,
+            modifier = Modifier.size(28.dp)
+        )
+    }
+}
+
+private fun sendAction(actionType: ActionType) {
+    val json = JSONObject().apply { put("action", actionType) }
+    MouseWebSocketClient.sendAction(json)
+}
+
+private fun Modifier.repeatingScroll(
+    scrollAmount: Int,
+    initialDelayMillis: Long = 300L,
+    repeatDelayMillis: Long = 60L
+): Modifier = composed {
+    val coroutineScope = rememberCoroutineScope()
+    var scrollJob by remember { mutableStateOf<Job?>(null) }
+
+    fun emitScroll() {
+        val json = JSONObject().apply {
+            put("action", ActionType.SCROLL)
+            put("amount", scrollAmount)
+        }
+        MouseWebSocketClient.sendAction(json)
+    }
+
+    pointerInput(Unit) {
+        detectTapGestures(
+            onPress = {
+                emitScroll()
+                scrollJob = coroutineScope.launch {
+                    delay(initialDelayMillis)
+                    while (true) {
+                        emitScroll()
+                        delay(repeatDelayMillis)
+                    }
+                }
+                try {
+                    awaitRelease()
+                } finally {
+                    scrollJob?.cancel()
+                }
+            }
+        )
+    }
 }

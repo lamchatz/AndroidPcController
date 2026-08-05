@@ -27,6 +27,7 @@ import lchat.pccontroller.components.buttons.IntellijButton
 import lchat.pccontroller.components.buttons.NetflixButton
 import lchat.pccontroller.components.buttons.OperaButton
 import lchat.pccontroller.components.buttons.SpotifyButton
+import lchat.pccontroller.components.buttons.StremioButton
 import lchat.pccontroller.components.buttons.TODOButton
 import lchat.pccontroller.components.utils.MenuGradient
 import lchat.pccontroller.yt.YoutubeButton
@@ -54,7 +55,8 @@ fun MenuScreen(
         { IntellijButton() },
         { AndroidStudioButton() },
         { OperaButton() },
-        { TODOButton() }
+        { TODOButton() },
+        { StremioButton() }
     )
 
     Box(

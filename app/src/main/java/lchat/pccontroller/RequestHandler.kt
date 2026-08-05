@@ -103,6 +103,8 @@ class RequestHandler private constructor() {
 
         suspend fun openSpotify(): Boolean = makeRequest("open/spotify")
 
+        suspend fun openStremio(): Boolean = makeRequest("open/stremio")
+
         suspend fun openYoutube(): Boolean = makeRequest("open/youtube")
         suspend fun openYoutubeVideo(videoId: String): Boolean =
             makeRequest("open/youtube?videoId=$videoId")
